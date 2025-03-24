@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String    @unique
+  username       String    @unique
+  password       String
+  contactNumber  String?
+  position       String // Government Employee, Private Employee, Self Employee, Other
+  incomeSources  String[] // List of income sources
+  financialGoals String[] // List of financial goals
+  expenses       Expense[] // One-to-many relation with Expense
+  incomes        Income[] // One-to-many relation with Income
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Expense {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Float
+  category  String
+  date      DateTime
+  reason    String?
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Income {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Float
+  source    String
+  date      DateTime
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
